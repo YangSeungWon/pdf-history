@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import db, { Version } from '../db/database.js';
 import { requireAuth } from './auth.js';
@@ -73,7 +74,6 @@ router.delete('/:id', requireAuth, (req: Request, res: Response) => {
     return;
   }
 
-  const fs = require('fs');
   const filePath = path.join(uploadsDir, version.filename);
 
   try {

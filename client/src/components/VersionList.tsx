@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Version, api } from '../api/client';
+import { Version } from '../api/client';
 
 interface VersionListProps {
   versions: Version[];
@@ -7,6 +7,7 @@ interface VersionListProps {
   onVersionSelect: (id: number) => void;
   onDelete: (id: number) => void;
   onMemoUpdate: (id: number, memo: string) => void;
+  onViewPdf: (version: Version) => void;
 }
 
 function VersionList({
@@ -15,6 +16,7 @@ function VersionList({
   onVersionSelect,
   onDelete,
   onMemoUpdate,
+  onViewPdf,
 }: VersionListProps) {
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
   const [memoText, setMemoText] = useState('');
@@ -124,14 +126,12 @@ function VersionList({
                 </div>
 
                 <div className="flex gap-2">
-                  <a
-                    href={api.versions.getPdfUrl(version.id)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => onViewPdf(version)}
                     className="text-sm text-blue-600 hover:text-blue-800"
                   >
-                    View PDF
-                  </a>
+                    View
+                  </button>
                   <button
                     onClick={() => onDelete(version.id)}
                     className="text-sm text-red-600 hover:text-red-800"

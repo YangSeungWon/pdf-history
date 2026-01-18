@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { api, Version } from '../api/client';
 import PdfUploader from '../components/PdfUploader';
 import VersionList from '../components/VersionList';
+import PdfPreview from '../components/PdfPreview';
 
 function Home() {
   const navigate = useNavigate();
   const [versions, setVersions] = useState<Version[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVersions, setSelectedVersions] = useState<number[]>([]);
+  const [viewingPdf, setViewingPdf] = useState<Version | null>(null);
 
   const loadVersions = async () => {
     try {
@@ -100,6 +102,15 @@ function Home() {
           onVersionSelect={handleVersionSelect}
           onDelete={handleDelete}
           onMemoUpdate={handleMemoUpdate}
+          onViewPdf={setViewingPdf}
+        />
+      )}
+
+      {viewingPdf && (
+        <PdfPreview
+          url={api.versions.getPdfUrl(viewingPdf.id)}
+          filename={viewingPdf.original_name}
+          onClose={() => setViewingPdf(null)}
         />
       )}
     </div>

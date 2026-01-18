@@ -1,9 +1,21 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, '../../data.db');
+
+// Docker에서는 /app/data, 로컬에서는 프로젝트 루트
+const dataDir = process.env.NODE_ENV === 'production'
+  ? '/app/data'
+  : path.join(__dirname, '../..');
+
+// 디렉토리 생성
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const dbPath = path.join(dataDir, 'data.db');
 
 const db = new Database(dbPath);
 
