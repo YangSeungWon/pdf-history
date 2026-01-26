@@ -13,7 +13,6 @@ interface PdfPreviewProps {
 
 function PdfPreview({ url, filename, onClose }: PdfPreviewProps) {
   const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.0);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -35,31 +34,15 @@ function PdfPreview({ url, filename, onClose }: PdfPreviewProps) {
             </button>
             <span className="text-sm">{Math.round(scale * 100)}%</span>
             <button
-              onClick={() => setScale(s => Math.min(2, s + 0.25))}
+              onClick={() => setScale(s => Math.min(3, s + 0.25))}
               className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600"
             >
               +
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPageNumber(p => Math.max(1, p - 1))}
-              disabled={pageNumber <= 1}
-              className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50"
-            >
-              &lt;
-            </button>
-            <span className="text-sm">
-              {pageNumber} / {numPages}
-            </span>
-            <button
-              onClick={() => setPageNumber(p => Math.min(numPages, p + 1))}
-              disabled={pageNumber >= numPages}
-              className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50"
-            >
-              &gt;
-            </button>
-          </div>
+          <span className="text-sm text-gray-400">
+            {numPages} pages
+          </span>
           <a
             href={url}
             download
@@ -76,20 +59,24 @@ function PdfPreview({ url, filename, onClose }: PdfPreviewProps) {
         </div>
       </div>
 
-      {/* PDF Viewer */}
-      <div className="flex-1 overflow-auto flex justify-center p-4 bg-gray-800">
+      {/* PDF Viewer - All pages rendered for Ctrl+F search */}
+      <div className="flex-1 overflow-auto flex flex-col items-center p-4 bg-gray-800 gap-4">
         <Document
           file={url}
           onLoadSuccess={onDocumentLoadSuccess}
           loading={<div className="text-white">Loading PDF...</div>}
           error={<div className="text-red-400">Failed to load PDF</div>}
         >
-          <Page
-            pageNumber={pageNumber}
-            scale={scale}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
-          />
+          {Array.from({ length: numPages }, (_, index) => (
+            <Page
+              key={index + 1}
+              pageNumber={index + 1}
+              scale={scale}
+              renderTextLayer={true}
+              renderAnnotationLayer={true}
+              className="shadow-lg mb-4"
+            />
+          ))}
         </Document>
       </div>
     </div>

@@ -202,9 +202,8 @@ function VersionList({
 
               {!isCollapsed && (
                 <div className="divide-y">
-                  {groupVersions.map((version) => {
-                    const globalIndex = versions.indexOf(version);
-                    const versionNumber = versions.length - globalIndex;
+                  {groupVersions.map((version, index) => {
+                    const versionNumber = groupVersions.length - index;
                     return renderVersionItem(version, versionNumber);
                   })}
                 </div>

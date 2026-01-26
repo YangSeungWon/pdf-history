@@ -46,7 +46,9 @@ router.get('/:id/pdf', requireAuth, (req: Request, res: Response) => {
   }
 
   const filePath = path.join(uploadsDir, version.filename);
-  res.download(filePath, version.original_name);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(version.original_name)}"`);
+  res.sendFile(filePath);
 });
 
 router.put('/:id/memo', requireAuth, (req: Request, res: Response) => {
