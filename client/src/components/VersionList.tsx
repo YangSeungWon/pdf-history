@@ -58,7 +58,8 @@ function VersionList({
   const groupedVersions = useMemo(() => {
     const groups: Map<string, Version[]> = new Map();
     for (const version of versions) {
-      const groupKey = version.original_name.split(/[\s_]/)[0];
+      const nameWithoutExt = version.original_name.replace(/\.pdf$/i, '');
+      const groupKey = nameWithoutExt.split(/[\s_]/)[0];
       if (!groups.has(groupKey)) {
         groups.set(groupKey, []);
       }
