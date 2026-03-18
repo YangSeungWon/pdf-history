@@ -14,6 +14,7 @@ interface PdfPreviewProps {
 function PdfPreview({ url, filename, onClose }: PdfPreviewProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [scale, setScale] = useState(1.0);
+  const [dualPage, setDualPage] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [matchCount, setMatchCount] = useState(0);
@@ -193,9 +194,27 @@ function PdfPreview({ url, filename, onClose }: PdfPreviewProps) {
               +
             </button>
           </div>
+          <button
+            onClick={() => setDualPage(d => !d)}
+            className={`px-3 py-1 rounded text-sm ${dualPage ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-700 hover:bg-gray-600'}`}
+          >
+            {dualPage ? '2-up' : '1-up'}
+          </button>
           <span className="text-sm text-gray-400">
             {numPages} pages
           </span>
+          <button
+            onClick={() => {
+              if (document.fullscreenElement) {
+                document.exitFullscreen();
+              } else {
+                document.documentElement.requestFullscreen();
+              }
+            }}
+            className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm"
+          >
+            Fullscreen
+          </button>
           <button
             onClick={openSearch}
             className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm"
@@ -270,16 +289,45 @@ function PdfPreview({ url, filename, onClose }: PdfPreviewProps) {
           loading={<div className="text-white">Loading PDF...</div>}
           error={<div className="text-red-400">Failed to load PDF</div>}
         >
-          {Array.from({ length: numPages }, (_, index) => (
-            <div key={index + 1} className="shadow-lg mb-4">
-              <Page
-                pageNumber={index + 1}
-                scale={scale}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-              />
-            </div>
-          ))}
+          {dualPage ? (
+            Array.from({ length: Math.ceil(numPages / 2) }, (_, rowIndex) => {
+              const left = rowIndex * 2 + 1;
+              const right = rowIndex * 2 + 2;
+              return (
+                <div key={rowIndex} className="flex gap-4 mb-4">
+                  <div className="shadow-lg">
+                    <Page
+                      pageNumber={left}
+                      scale={scale}
+                      renderTextLayer={true}
+                      renderAnnotationLayer={true}
+                    />
+                  </div>
+                  {right <= numPages && (
+                    <div className="shadow-lg">
+                      <Page
+                        pageNumber={right}
+                        scale={scale}
+                        renderTextLayer={true}
+                        renderAnnotationLayer={true}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            Array.from({ length: numPages }, (_, index) => (
+              <div key={index + 1} className="shadow-lg mb-4">
+                <Page
+                  pageNumber={index + 1}
+                  scale={scale}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                />
+              </div>
+            ))
+          )}
         </Document>
       </div>
     </div>
